@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PAI — Privacy AI</title>
+<style>
+:root{color-scheme:dark;--bg:#0c121e;--s1:#121b2d;--s2:#18233a;--ln:#24324d;--tx:#e8eef8;--mu:#93a3bd;--ac:#2de3c0;--wn:#f2b84b;box-sizing:border-box}
+*,*::before,*::after{box-sizing:inherit}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--tx);font:15px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.app{height:100%;display:grid;grid-template-columns:230px 1fr auto}
+.side{background:var(--s1);border-right:1px solid var(--ln);padding:14px;display:flex;flex-direction:column;gap:12px}
+.logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:1.1rem}
+.nb{background:var(--s2);border:1px solid var(--ln);border-radius:8px;padding:9px 12px;cursor:pointer;text-align:left}
+.nb:hover{border-color:var(--ac)}
+.hint{color:var(--mu);font-size:.8rem;margin-top:auto}
+.main{display:flex;flex-direction:column;min-width:0;height:100%}
+.top{display:flex;align-items:center;gap:10px;padding:10px 18px;border-bottom:1px solid var(--ln)}
+.top .sp{flex:1}
+.shield{display:flex;align-items:center;gap:6px;background:none;border:1px solid var(--ln);border-radius:99px;padding:4px 12px;color:var(--ac);cursor:pointer;font-size:.85rem}
+.shield i{width:8px;height:8px;border-radius:50%;background:var(--ac)}
+.lg{display:flex;border:1px solid var(--ln);border-radius:8px;overflow:hidden}
+.lg button{background:none;border:0;padding:4px 9px;cursor:pointer;color:var(--mu);font-size:.8rem}
+.lg button[aria-pressed=true]{background:var(--ac);color:#04251f;font-weight:600}
+.chat{flex:1;overflow-y:auto;padding:20px 18px}
+.col{max-width:760px;margin:0 auto}
+.empty{text-align:center;padding-top:12vh}
+.empty h1{font-size:clamp(1.6rem,4vw,2.3rem);margin:0 0 8px}
+.empty p{color:var(--mu);margin:0 0 22px}
+.sg{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));text-align:left}
+.sg button{background:var(--s1);border:1px solid var(--ln);border-radius:10px;padding:12px;cursor:pointer;color:var(--mu);font-size:.88rem;text-align:left}
+.sg button:hover{border-color:var(--ac);color:var(--tx)}
+.msg{display:flex;margin:0 0 16px}
+.msg.u{justify-content:flex-end}
+.bub{max-width:88%;white-space:pre-wrap;word-break:break-word;padding:10px 14px;border-radius:14px}
+.u .bub{background:var(--s2);border:1px solid var(--ln)}
+.a .bub{padding-left:0}
+.pi{border-bottom:1.5px dotted var(--ac);cursor:help}
+.pr{border-bottom:1.5px dotted var(--wn);cursor:help}
+.cur::after{content:"▍";color:var(--ac);animation:bl 1s steps(2) infinite}
+@keyframes bl{50%{opacity:0}}
+.note{color:var(--wn);font-size:.8rem;margin:-8px 0 14px}
+.comp{padding:10px 18px 16px}
+.cbox{max-width:760px;margin:0 auto;display:flex;gap:8px;align-items:flex-end;background:var(--s1);border:1px solid var(--ln);border-radius:16px;padding:8px 8px 8px 14px}
+.cbox:focus-within{border-color:var(--ac)}
+.cbox textarea{flex:1;background:none;border:0;resize:none;max-height:180px;min-height:28px;outline:0;padding:4px 0}
+.send{background:var(--ac);color:#04251f;border:0;border-radius:10px;width:38px;height:38px;cursor:pointer;font-weight:700}
+.send:disabled{opacity:.35;cursor:not-allowed}
+.foot{max-width:760px;margin:6px auto 0;text-align:center;color:var(--mu);font-size:.75rem}
+.panel{width:340px;background:var(--s1);border-left:1px solid var(--ln);display:flex;flex-direction:column;height:100%;overflow:hidden}
+.panel.off{display:none}
+.tabs{display:flex;border-bottom:1px solid var(--ln)}
+.tabs button{flex:1;background:none;border:0;padding:12px;cursor:pointer;color:var(--mu);border-bottom:2px solid transparent}
+.tabs button[aria-selected=true]{color:var(--tx);border-color:var(--ac)}
+.pb{padding:14px;overflow-y:auto;flex:1;font-size:.88rem}
+.pb h3{font-size:.9rem;margin:16px 0 6px}.pb h3:first-child{margin-top:0}
+.pb p{color:var(--mu);margin:0 0 8px}
+.box{background:var(--bg);border:1px solid var(--ln);border-radius:8px;padding:8px 10px;font:.8rem/1.5 ui-monospace,Menlo,Consolas,monospace;word-break:break-word;white-space:pre-wrap;max-height:130px;overflow:auto;color:var(--mu)}
+.box mark{background:rgba(45,227,192,.15);color:var(--ac);border-radius:3px;padding:0 2px}
+table{border-collapse:collapse;width:100%;font-size:.8rem}
+td,th{text-align:left;padding:5px 4px;border-bottom:1px solid var(--ln);vertical-align:top;word-break:break-word}
+td:first-child{font-family:ui-monospace,Menlo,Consolas,monospace;color:var(--ac);white-space:nowrap}
+.row{display:flex;gap:6px}
+.row input{flex:1;min-width:0;background:var(--bg);border:1px solid var(--ln);border-radius:6px;padding:5px 8px}
+.sm{background:var(--s2);border:1px solid var(--ln);border-radius:6px;padding:4px 10px;cursor:pointer;font-size:.8rem}
+details{margin:6px 0}summary{cursor:pointer;color:var(--mu)}
+label.ck{display:flex;gap:8px;align-items:center;padding:2px 0;color:var(--mu)}
+.chip{display:inline-flex;gap:4px;background:var(--s2);border:1px solid var(--ln);border-radius:99px;padding:1px 4px 1px 9px;margin:2px;font-size:.78rem}
+.chip button{background:none;border:0;cursor:pointer;color:var(--mu)}
+.tag{font-size:.68rem;border:1px solid var(--wn);color:var(--wn);border-radius:99px;padding:0 6px;margin-left:4px}
+ul.l{margin:0 0 8px;padding-left:18px;color:var(--mu)}
+@media (max-width:900px){
+ .app{grid-template-columns:1fr}.side{display:none}
+ .panel{position:fixed;inset:0 0 0 auto;width:min(380px,100%);z-index:30;padding-top:env(safe-area-inset-top,0px);box-shadow:-10px 0 30px rgba(0,0,0,.5)}
+}
+@media (prefers-reduced-motion:reduce){.cur::after{animation:none}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="side">
+ <div class="logo"><svg width="24" height="24" viewBox="0 0 26 26" fill="none" aria-hidden="true"><path d="M13 2l9 3.5v7c0 5.500-3.800 9.500-9 11.500C7.800 22 4 18 4 12.500v-7L13 2z" stroke="#2de3c0" stroke-width="1.8"/><path d="M9 13l3 3 5-6" stroke="#2de3c0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>PAI</div>
+ <button class="nb" id="new" data-t="new"></button>
+ <div class="hint" data-t="side"></div>
+</aside>
+<div class="main">
+ <div class="top"><b>PAI</b><span style="color:var(--mu)">Privacy AI</span><span class="sp"></span>
+  <button class="shield" id="sh" aria-expanded="true"><i></i><span data-t="prot"></span></button>
+  <div class="lg" role="group" aria-label="Language"><button data-l="ru" aria-pressed="true">RU</button><button data-l="en" aria-pressed="false">EN</button></div></div>
+ <div class="chat" id="chat"><div class="col" id="col"></div></div>
+ <div class="comp"><div class="cbox"><textarea id="in" rows="1" data-ph="ph" aria-label="Message"></textarea><button class="send" id="go" aria-label="Send">↑</button></div>
+ <div class="foot" data-t="foot"></div></div>
+</div>
+<aside class="panel" id="panel">
+ <div class="tabs" role="tablist"><button role="tab" id="t1" aria-selected="true" data-t="tab1"></button><button role="tab" id="t2" aria-selected="false" data-t="tab2"></button></div>
+ <div class="pb" id="p1"></div><div class="pb" id="p2" hidden></div>
+</aside>
+</div>
+<script>
+const LANGS=['ru','en'];let lang='ru';
+const T={
+new:['+ Новый чат','+ New chat'],side:['Обезличивание включено по умолчанию. Исходные значения хранятся только в этой вкладке.','Anonymization is on by default. Original values are kept in this tab only.'],
+prot:['Защита включена','Protection on'],ph:['Напишите сообщение…','Message PAI…'],
+foot:['PAI скрывает конфиденциальные данные до отправки и возвращает их в ответе. Прототип: проверяйте важные ответы.','PAI hides confidential data before sending and restores it in the answer. Prototype: verify important answers.'],
+h:['Чем помочь?','How can I help?'],hp:['Пишите как обычно — персональные и корпоративные данные модель не увидит.','Write as usual — the model will not see personal or corporate data.'],
+tab1:['Защита','Protection'],tab2:['О PAI','About PAI'],
+seen:['Что получила модель','What the model received'],none:['Пока нет сообщений.','No messages yet.'],
+tbl:['Таблица соответствий','Mapping table'],tblp:['Хранится только в памяти вкладки.','Kept in this tab’s memory only.'],
+cats:['Что защищать','What to protect'],cust:['Свои термины','Custom terms'],addp:['слово или фраза','word or phrase'],add:['Добавить','Add'],
+clr:['Очистить данные сессии','Clear session data'],
+dm:['Демо-режим: ИИ-модель недоступна, ответ имитирован локально.','Demo mode: AI model unavailable, reply simulated locally.'],
+err:['Не удалось получить ответ. Попробуйте позже.','Could not get an answer. Try again later.'],
+hl:['Подчёркнутые фрагменты были заменены идентификаторами; наведите курсор, чтобы увидеть.','Underlined fragments were replaced with identifiers; hover to see.'],
+how:['Как это работает','How it works'],
+how1:['Вы пишете запрос. 2. PAI находит конфиденциальные данные и заменяет их идентификаторами. 3. Модель получает только обезличенный текст. 4. PAI возвращает исходные значения в ответ.','You write a request. 2. PAI detects confidential data and swaps it for identifiers. 3. The model gets anonymized text only. 4. PAI restores the original values in the answer.'],
+pl:['планируется','planned'],
+plan:['Планируемые возможности','Planned features'],
+pf:[['Обработка документов','Разграничение доступа и политики','Защищённое хранение соответствий','Журналирование и сроки хранения','Подключение разных ИИ-моделей','Локальное развёртывание (On-Premises)'],['Document processing','Access control and policies','Protected mapping storage','Logging and retention','Multiple AI models','On-premises deployment']],
+note:['Сейчас распознавание построено на правилах и настроено на русскоязычные данные: часть сведений может быть пропущена. Сертификации и аудита безопасности нет, гарантий анонимности не даётся. Не отправляйте данные, критичные для вашей организации.','Detection is currently rule-based and tuned for Russian-language data: some information may be missed. There is no certification or security audit and no guarantee of anonymity. Do not send data critical to your organization.']};
+const EX=[['АО "Казахтелеком" планирует реконструкцию объекта по адресу: г. Уральск, пр. Абая, 90/2. Ответственный — Иванов Иван Иванович. Составь техническое задание на установку двух дизель-генераторных установок мощностью 1400 кВт.','Составь ТЗ на реконструкцию'],['Напиши письмо контрагенту по договору № 45/2026 на сумму 12 500 000 тенге. Контакт: Серикбаев Арман Нурланович, +7 701 123 45 67, a.serikbaev@example.kz.','Письмо по договору'],['Проверь конфигурацию: сервер 10.20.30.40, MAC 00:1A:2B:3C:4D:5E. Какие риски ты видишь?','Анализ конфигурации сети']];
+const CN={PERSON:['Персоны','People'],ORG:['Организации','Organizations'],ADDRESS:['Адреса','Addresses'],EMAIL:['E-mail','E-mail'],PHONE:['Телефоны','Phones'],IIN:['ИИН','IIN'],IP:['IP-адреса','IP addresses'],MAC:['MAC-адреса','MAC addresses'],CONTRACT:['Договоры','Contracts'],AMOUNT:['Суммы','Amounts'],CUSTOM:['Свои термины','Custom terms']};
+const RX=[['ORG',/(?:АО|ТОО|ОАО|JSC|LLP)\s*[«"“][^»"”\n]+[»"”]/g],['ADDRESS',/г\.\s?[А-ЯЁ][а-яё-]+,\s*(?:пр\.|пр-т|ул\.|мкр\.)\s?[А-ЯЁ][а-яё-]+(?:\s[А-ЯЁ][а-яё-]+)?,\s?\d+[а-яА-Я]?(?:\/\d+)?/g],['PERSON',/[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+(?:вич|вна|ич|ична|оглы|кызы|улы)(?![а-яё])/g],['PERSON',/[А-ЯЁ][а-яё]+\s[А-ЯЁ]\.\s?[А-ЯЁ]\./g],['EMAIL',/[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g],['PHONE',/\+?[78][\s(-]*\d{3}[\s)-]*\d{3}[\s-]*\d{2}[\s-]*\d{2}/g],['IIN',/(?<!\d)\d{12}(?!\d)/g],['IP',/(?<!\d)(?:\d{1,3}\.){3}\d{1,3}(?!\d)/g],['MAC',/(?:[0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}/g],['CONTRACT',/(?:договор[а-я]*|контракт[а-я]*)\s*№\s*[\w\/-]+/gi],['AMOUNT',/\d[\d\s]*(?:[.,]\d+)?\s?(?:₸|тенге|тг\.?|KZT|USD|\$|руб\.?|EUR|€)/g]];
+const $=id=>document.getElementById(id);
+const t=k=>T[k][LANGS.indexOf(lang)];
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let S,sample=null,busy=false,ctl=null;
+function fresh(){S={ids:{},byId:{},cnt:{},off:{},custom:[],msgs:[],last:null,demo:false}}
+fresh();
+if(window.claude&&claude.use)claude.use('sample').then(s=>{sample=s}).catch(()=>{});
+
+function detect(text){
+ const f=[];
+ S.custom.forEach(v=>{let i=-1;while((i=text.indexOf(v,i+1))>=0)f.push({s:i,e:i+v.length,c:'CUSTOM',v})});
+ RX.forEach(([c,re])=>{re.lastIndex=0;let m;while((m=re.exec(text))){const v=m[0].replace(/[\s.,;]+$/,'');f.push({s:m.index,e:m.index+v.length,c,v})}});
+ f.sort((a,b)=>a.s-b.s||(b.e-b.s)-(a.e-a.s));
+ const o=[];let end=-1;for(const x of f){if(x.s>=end&&!S.off[x.c]){o.push(x);end=x.e}}
+ return o;
+}
+function idFor(c,v){
+ const k=c+'|'+v;
+ if(!S.ids[k]){S.cnt[c]=(S.cnt[c]||0)+1;const id='['+c+'_'+String(S.cnt[c]).padStart(3,'0')+']';S.ids[k]=id;S.byId[id]={c,v}}
+ return S.ids[k];
+}
+function anonymize(text){
+ let a='',h='',p=0;
+ detect(text).forEach(x=>{const id=idFor(x.c,x.v);a+=text.slice(p,x.s)+id;h+=esc(text.slice(p,x.s))+'<span class="pi" title="'+esc(id)+'">'+esc(x.v)+'</span>';p=x.e});
+ return{anon:a+text.slice(p),html:h+esc(text.slice(p))};
+}
+function restore(raw){
+ return esc(raw).split(/(\[[A-Z]+_\d{3}\])/).map(s=>S.byId[s]?'<span class="pr" title="'+s+'">'+esc(S.byId[s].v)+'</span>':s).join('').replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>');
+}
+function plain(raw){return raw.replace(/\[[A-Z]+_\d{3}\]/g,m=>S.byId[m]?S.byId[m].v:m)}
+
+function renderEmpty(){
+ $('col').innerHTML='<div class="empty"><h1>'+t('h')+'</h1><p>'+t('hp')+'</p><div class="sg">'+EX.map((e,i)=>'<button data-ex="'+i+'">'+esc(e[1])+'</button>').join('')+'</div></div>';
+}
+function addMsg(cls,html){
+ if(!S.msgs.length&&!$('col').querySelector('.msg'))$('col').innerHTML='';
+ const d=document.createElement('div');d.className='msg '+cls;d.innerHTML='<div class="bub">'+html+'</div>';$('col').appendChild(d);
+ $('chat').scrollTop=1e9;return d.firstChild;
+}
+async function send(text){
+ text=text.trim();if(!text||busy)return;busy=true;$('go').disabled=true;$('in').value='';$('in').style.height='';
+ const r=anonymize(text);
+ addMsg('u',r.html);S.msgs.push({role:'user',anon:r.anon});
+ S.last={anon:r.anon,raw:''};renderPanel();
+ const bub=addMsg('a','');bub.classList.add('cur');
+ const sys='You are PAI, a helpful assistant. Sensitive values in the user\'s messages were replaced with placeholders such as [PERSON_001] or [ORG_001]. Treat each placeholder as the real value: never ask for the real value, never guess it, and write placeholders exactly as given when you refer to them. Reply in the user\'s language.';
+ const input=S.msgs.map((m,i)=>({role:m.role,content:(i===0?sys+'\n\n':'')+(m.role==='user'?m.anon:m.raw)}));
+ let raw='';
+ try{
+  if(!sample)throw{code:'not_granted'};
+  ctl=new AbortController();
+  const res=await sample(input,{cache:false,signal:ctl.signal,onText:({text})=>{raw=text;S.last.raw=raw;bub.innerHTML=restore(raw)+'';bub.classList.add('cur');$('chat').scrollTop=1e9}});
+  raw=res.text;
+ }catch(e){
+  if(e&&e.code==='not_granted'){
+   S.demo=true;const ids=[...new Set(r.anon.match(/\[[A-Z]+_\d{3}\]/g)||[])];
+   raw=(lang==='ru'?'Принято. Модель получила такой текст: «':'Got it. The model received this text: «')+r.anon+'»'+(ids.length?(lang==='ru'?'\n\nИдентификаторы в ответе заменяются исходными значениями: ':'\n\nIdentifiers in the answer are replaced with original values: ')+ids.join(', ')+'.':'');
+   S.last.raw=raw;
+  }else{raw=(e&&e.text)||'';S.msgs.pop();bub.innerHTML=raw?restore(raw):esc(t('err'))}
+ }
+ bub.classList.remove('cur');
+ if(raw){bub.innerHTML=restore(raw);if(S.msgs.length&&S.msgs[S.msgs.length-1].role==='user')S.msgs.push({role:'assistant',raw})}
+ if(S.demo&&raw){const n=document.createElement('div');n.className='note';n.textContent=t('dm');$('col').appendChild(n)}
+ busy=false;$('go').disabled=false;renderPanel();$('in').focus();
+}
+function hl(a){return esc(a).replace(/\[[A-Z]+_\d{3}\]/g,'<mark>$&</mark>')}
+function renderPanel(){
+ const rows=Object.keys(S.byId).map(id=>'<tr><td>'+esc(id)+'</td><td>'+esc(S.byId[id].v)+'</td></tr>').join('');
+ const cats=Object.keys(CN).filter(k=>k!=='CUSTOM').map(k=>'<label class="ck"><input type="checkbox" data-c="'+k+'"'+(S.off[k]?'':' checked')+'>'+CN[k][LANGS.indexOf(lang)]+'</label>').join('');
+ const ps=$('p1').querySelector('#cin')?$('p1').querySelector('#cin').value:'';
+ $('p1').innerHTML='<h3>'+t('seen')+'</h3>'+(S.last?'<div class="box">'+hl(S.last.anon)+'</div>'+(S.last.raw?'<div class="box" style="margin-top:6px">'+hl(S.last.raw)+'</div>':''):'<p>'+t('none')+'</p>')+(S.last?'<p style="margin-top:6px">'+t('hl')+'</p>':'')+
+ '<h3>'+t('tbl')+'</h3><p>'+t('tblp')+'</p>'+(rows?'<table>'+rows+'</table>':'')+
+ '<details><summary>'+t('cats')+'</summary>'+cats+'</details>'+
+ '<details open><summary>'+t('cust')+'</summary><div class="row" style="margin-top:6px"><input id="cin" placeholder="'+t('addp')+'" value="'+esc(ps)+'"><button class="sm" id="cadd">'+t('add')+'</button></div><div>'+S.custom.map((v,i)=>'<span class="chip">'+esc(v)+'<button data-rm="'+i+'" aria-label="×">×</button></span>').join('')+'</div></details>'+
+ '<p style="margin-top:14px"><button class="sm" id="cclr">'+t('clr')+'</button></p>';
+ const pf=T.pf[LANGS.indexOf(lang)];
+ $('p2').innerHTML='<h3>'+t('how')+'</h3><p>1. '+t('how1')+'</p><h3>'+t('plan')+'</h3><ul class="l">'+pf.map(x=>'<li>'+x+'<span class="tag">'+t('pl')+'</span></li>').join('')+'</ul><div class="box" style="max-height:none;margin-top:12px">'+t('note')+'</div>';
+}
+function render(){
+ document.documentElement.lang=lang;
+ document.querySelectorAll('[data-t]').forEach(e=>e.textContent=t(e.dataset.t));
+ $('in').placeholder=t('ph');
+ document.querySelectorAll('.lg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.l===lang));
+ if(!S.msgs.length)renderEmpty();
+ renderPanel();
+}
+document.querySelectorAll('.lg button').forEach(b=>b.onclick=()=>{lang=b.dataset.l;render()});
+$('go').onclick=()=>send($('in').value);
+$('in').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();send($('in').value)}};
+$('in').oninput=e=>{e.target.style.height='auto';e.target.style.height=Math.min(e.target.scrollHeight,180)+'px'};
+$('col').onclick=e=>{const b=e.target.closest('[data-ex]');if(b)send(EX[+b.dataset.ex][0])};
+$('new').onclick=()=>{if(ctl)ctl.abort();fresh();busy=false;$('go').disabled=false;render()};
+$('sh').onclick=()=>{const p=$('panel');p.classList.toggle('off');$('sh').setAttribute('aria-expanded',!p.classList.contains('off'))};
+['t1','t2'].forEach((id,i)=>$(id).onclick=()=>{$('t1').setAttribute('aria-selected',i===0);$('t2').setAttribute('aria-selected',i===1);$('p1').hidden=i!==0;$('p2').hidden=i!==1});
+$('p1').onclick=e=>{
+ const g=e.target;
+ if(g.id==='cadd'){const v=$('cin').value.trim();if(v&&!S.custom.includes(v))S.custom.push(v);$('cin').value='';renderPanel()}
+ if(g.dataset.rm!==undefined){S.custom.splice(+g.dataset.rm,1);renderPanel()}
+ if(g.id==='cclr'){S.ids={};S.byId={};S.cnt={};S.msgs=[];S.last=null;$('col').innerHTML='';renderEmpty();renderPanel()}
+};
+$('p1').onchange=e=>{const c=e.target.dataset.c;if(c)S.off[c]=!e.target.checked};
+if(innerWidth<=900)$('panel').classList.add('off');
+render();
+</script>
+</body>
+</html>
